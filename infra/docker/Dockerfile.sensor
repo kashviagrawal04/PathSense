@@ -1,0 +1,22 @@
+# PathSense v2 — Sensor Ingest Service
+FROM python:3.11-slim
+
+RUN groupadd -r pathsense && useradd -r -g pathsense pathsense
+
+WORKDIR /app
+
+COPY requirements-services.txt .
+RUN pip install --no-cache-dir -r requirements-services.txt
+
+COPY services/sensor_ingest/ ./services/sensor_ingest/
+
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 8001
+
+USER pathsense
+
+CMD ["python", "-m", "uvicorn", "services.sensor_ingest.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8001", \
+     "--workers", "2"]

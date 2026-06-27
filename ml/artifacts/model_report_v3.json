@@ -1,0 +1,112 @@
+{
+  "version": "3.0",
+  "trained_at": "2026-08-06T11:25:30.051777",
+  "model_backend": "lightgbm",
+  "n_samples": 50000,
+  "n_features": 35,
+  "features": [
+    "speed_limit_kmh",
+    "num_vehicles",
+    "pedestrian_involved",
+    "lat",
+    "lon",
+    "hour_sin",
+    "hour_cos",
+    "month_sin",
+    "month_cos",
+    "is_night",
+    "is_rush_hour",
+    "is_weekend",
+    "is_friday_night",
+    "lighting_risk",
+    "weather_risk",
+    "road_risk",
+    "cond_risk",
+    "ctrl_risk",
+    "speed_bin",
+    "is_high_speed",
+    "log_vehicles",
+    "multi_vehicle",
+    "composite_risk",
+    "dark_wet",
+    "night_highway",
+    "fog_dark",
+    "storm_wet",
+    "speed_dark",
+    "no_ctrl_highway",
+    "rush_multi_vehicle",
+    "ped_dark",
+    "icy_road",
+    "has_gps",
+    "lat_rounded",
+    "lon_rounded"
+  ],
+  "optimal_threshold": 0.5240731241587904,
+  "metrics": {
+    "roc_auc": 0.6184,
+    "accuracy": 0.7135,
+    "f1_score": 0.6482,
+    "average_precision": 0.5422,
+    "cv_roc_auc_mean": 0.7550284814514674,
+    "cv_roc_auc_std": 0.01168073120181561
+  },
+  "confusion_matrix": [
+    [
+      0,
+      1580
+    ],
+    [
+      0,
+      8420
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 1580.0
+    },
+    "1": {
+      "precision": 0.842,
+      "recall": 1.0,
+      "f1-score": 0.9142236699239956,
+      "support": 8420.0
+    },
+    "accuracy": 0.842,
+    "macro avg": {
+      "precision": 0.421,
+      "recall": 0.5,
+      "f1-score": 0.4571118349619978,
+      "support": 10000.0
+    },
+    "weighted avg": {
+      "precision": 0.7089639999999999,
+      "recall": 0.842,
+      "f1-score": 0.7697763300760043,
+      "support": 10000.0
+    }
+  },
+  "shap_importance_top20": {
+    "composite_risk": 0.1257053918027968,
+    "speed_limit_kmh": 0.09296038915873762,
+    "is_night": 0.07417540226385336,
+    "speed_bin": 0.029288966081213497,
+    "pedestrian_involved": 0.017589290755119332,
+    "ctrl_risk": 0.01436617725605068,
+    "road_risk": 0.013249177269587827,
+    "weather_risk": 0.01137569176320482,
+    "hour_cos": 0.009970172409345519,
+    "dark_wet": 0.00659995857842889,
+    "num_vehicles": 0.006262114487827365,
+    "lon": 0.004024278897296209,
+    "lighting_risk": 0.003854584617802899,
+    "hour_sin": 0.0037116538036961752,
+    "month_sin": 0.0032175885051185585,
+    "lat": 0.0024226757857615873,
+    "cond_risk": 0.0016784060181281111,
+    "month_cos": 0.001631975735154589,
+    "no_ctrl_highway": 0.001227972230075129,
+    "night_highway": 0.0008567396422445841
+  }
+}

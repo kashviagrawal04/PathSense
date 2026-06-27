@@ -1,0 +1,7 @@
+Metric,Value
+Training Rows,2400
+Testing Rows,600
+Low Risk Samples,1034
+High Risk Samples,1966
+Missing Values Removed,0
+Engineered Feature,Time_Category derived from Time of Day

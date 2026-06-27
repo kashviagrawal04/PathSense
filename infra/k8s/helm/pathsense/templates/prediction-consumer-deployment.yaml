@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-prediction-consumer
+  labels:
+    app: pathsense-prediction-consumer
+    version: {{ .Values.global.image.tag | quote }}
+spec:
+  replicas: {{ .Values.predictionConsumer.replicaCount }}
+  selector:
+    matchLabels:
+      app: pathsense-prediction-consumer
+  template:
+    metadata:
+      labels:
+        app: pathsense-prediction-consumer
+        version: {{ .Values.global.image.tag | quote }}
+    spec:
+      containers:
+        - name: prediction-consumer
+          image: "{{ .Values.global.image.registry }}/{{ .Values.predictionConsumer.image.name }}:{{ .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.kafka.bootstrapServers | quote }}
+            - name: REDIS_URL
+              value: {{ .Values.redis.url | quote }}
+            - name: ALERT_THRESHOLD
+              value: {{ .Values.predictionConsumer.env.ALERT_THRESHOLD | quote }}
+            - name: ALERT_COOLDOWN_SEC
+              value: {{ .Values.predictionConsumer.env.ALERT_COOLDOWN_SEC | quote }}
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.postgres.username }}:{{ .Values.secrets.postgresPassword }}@{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}"
+          resources:
+            requests:
+              cpu: {{ .Values.predictionConsumer.resources.requests.cpu | quote }}
+              memory: {{ .Values.predictionConsumer.resources.requests.memory | quote }}
+            limits:
+              cpu: {{ .Values.predictionConsumer.resources.limits.cpu | quote }}
+              memory: {{ .Values.predictionConsumer.resources.limits.memory | quote }}
+          {{- if .Values.mlArtifacts.enabled }}
+          volumeMounts:
+            - name: ml-artifacts
+              mountPath: /app/ml/artifacts
+              readOnly: true
+          {{- end }}
+      {{- if .Values.mlArtifacts.enabled }}
+      volumes:
+        - name: ml-artifacts
+          persistentVolumeClaim:
+            claimName: {{ if .Values.mlArtifacts.existingClaim }}{{ .Values.mlArtifacts.existingClaim }}{{ else }}pathsense-ml-artifacts{{ end }}
+      {{- end }}

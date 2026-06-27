@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-vision-service
+  labels:
+    app: pathsense-vision-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pathsense-vision-service
+  template:
+    metadata:
+      labels:
+        app: pathsense-vision-service
+    spec:
+      containers:
+        - name: vision-service
+          image: "{{ .Values.global.image.registry }}/pathsense-vision:{{ .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          ports:
+            - containerPort: 8002
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.kafka.bootstrapServers | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-vision-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8002
+      targetPort: 8002
+  selector:
+    app: pathsense-vision-service

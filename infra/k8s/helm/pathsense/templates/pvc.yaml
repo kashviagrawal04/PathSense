@@ -1,0 +1,13 @@
+{{- if and .Values.mlArtifacts.enabled (not .Values.mlArtifacts.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pathsense-ml-artifacts
+spec:
+  accessModes:
+    - {{ .Values.mlArtifacts.accessMode }}
+  storageClassName: {{ .Values.mlArtifacts.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.mlArtifacts.size }}
+{{- end }}

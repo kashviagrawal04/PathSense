@@ -1,0 +1,232 @@
+version: "3.9"
+
+# PathSense v2 — Full local development stack
+# Usage: docker compose up
+# API:        http://localhost:8000
+# Kafka UI:   http://localhost:8080
+# Grafana:    http://localhost:3000 (admin/admin)
+# Redis:      localhost:6379
+
+x-common-env: &common-env
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  REDIS_URL: redis://redis:6379/0
+  DATABASE_URL: postgresql://pathsense:${POSTGRES_PASSWORD:-pathsense_dev}@postgres:5432/pathsense
+  OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY:-}
+  TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+  TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+  TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+  ALLOWED_ORIGINS: "*"
+
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9094:9094"  # external access
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_MESSAGE_MAX_BYTES: 1048576
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  kafka-init:
+    # Creates Kafka topics on startup
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic sensor-events       --partitions 6 --replication-factor 1
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic risk-predictions    --partitions 6 --replication-factor 1
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic alert-triggers      --partitions 3 --replication-factor 1
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic model-feedback      --partitions 3 --replication-factor 1
+        echo "Topics created."
+    restart: "no"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: pathsense-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+
+  redis:
+    image: redis:7.2-alpine
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pathsense
+      POSTGRES_USER: pathsense
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pathsense_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pathsense"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── PathSense Services ──────────────────────────────────────────────────────
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *common-env
+    volumes:
+      - ./ml/artifacts:/app/ml/artifacts:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  sensor-ingest:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.sensor
+    ports:
+      - "8001:8001"
+    environment:
+      <<: *common-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  prediction-consumer:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.consumer
+    environment:
+      <<: *common-env
+      ALERT_THRESHOLD: "0.70"
+      ALERT_COOLDOWN_SEC: "60"
+    volumes:
+      - ./ml/artifacts:/app/ml/artifacts:ro
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Scale to 2 consumers (Kafka partitions handle distribution)
+    deploy:
+      replicas: 2
+    restart: unless-stopped
+
+  alert-service:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.alert
+    environment:
+      <<: *common-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  vision-service:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.vision
+    ports:
+      - "8002:8002"
+    environment:
+      <<: *common-env
+      YOLO_MODEL_SIZE: yolov8n
+      DANGER_ZONE_M: "50.0"
+      WARN_ZONE_M: "100.0"
+    restart: unless-stopped
+
+  # ── Monitoring ──────────────────────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=7d"
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+
+volumes:
+  zookeeper_data:
+  kafka_data:
+  redis_data:
+  postgres_data:
+  grafana_data:

@@ -1,0 +1,15 @@
+# PathSense v2 — Grafana dashboard provisioning
+# This file tells Grafana where to look for dashboard JSON files.
+
+apiVersion: 1
+
+providers:
+  - name: PathSense Dashboards
+    orgId: 1
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true

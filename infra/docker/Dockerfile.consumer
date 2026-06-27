@@ -1,0 +1,22 @@
+# PathSense v2 — Prediction Consumer (Kafka worker)
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y libgomp1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -r pathsense && useradd -r -g pathsense pathsense
+
+WORKDIR /app
+
+COPY requirements.txt requirements-services.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-services.txt
+
+COPY ml/ ./ml/
+COPY services/sensor_ingest/prediction_consumer.py ./services/sensor_ingest/
+
+ENV PYTHONPATH=/app/ml:/app \
+    PYTHONUNBUFFERED=1
+
+USER pathsense
+
+# Worker script (not a web server — no EXPOSE)
+CMD ["python", "-u", "services/sensor_ingest/prediction_consumer.py"]

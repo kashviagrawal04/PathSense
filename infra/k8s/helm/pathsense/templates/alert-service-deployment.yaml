@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-alert-service
+  labels:
+    app: pathsense-alert-service
+    version: {{ .Values.global.image.tag | quote }}
+spec:
+  replicas: {{ .Values.alertService.replicaCount }}
+  selector:
+    matchLabels:
+      app: pathsense-alert-service
+  template:
+    metadata:
+      labels:
+        app: pathsense-alert-service
+        version: {{ .Values.global.image.tag | quote }}
+    spec:
+      containers:
+        - name: alert-service
+          image: "{{ .Values.global.image.registry }}/{{ .Values.alertService.image.name }}:{{ .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.kafka.bootstrapServers | quote }}
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.postgres.username }}:{{ .Values.secrets.postgresPassword }}@{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}"
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: pathsense-secrets
+                  key: twilio-account-sid
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: pathsense-secrets
+                  key: twilio-auth-token
+            - name: TWILIO_FROM_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: pathsense-secrets
+                  key: twilio-from-number
+          resources:
+            requests:
+              cpu: {{ .Values.alertService.resources.requests.cpu | quote }}
+              memory: {{ .Values.alertService.resources.requests.memory | quote }}
+            limits:
+              cpu: {{ .Values.alertService.resources.limits.cpu | quote }}
+              memory: {{ .Values.alertService.resources.limits.memory | quote }}

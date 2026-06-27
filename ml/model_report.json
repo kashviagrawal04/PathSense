@@ -1,0 +1,81 @@
+{
+  "target": "High_Risk (Serious or Fatal = 1)",
+  "n_samples": 3000,
+  "features": [
+    "Day of Week",
+    "Weather Conditions",
+    "Lighting Conditions",
+    "Road Type",
+    "Road Condition",
+    "Traffic Control Presence",
+    "Speed Limit (km/h)",
+    "Number of Vehicles Involved",
+    "Time_Category"
+  ],
+  "primary_model": "XGBClassifier",
+  "xgboost": {
+    "roc_auc": 0.5303130877309437,
+    "accuracy_holdout": 0.51,
+    "cv_accuracy_mean": 0.5346666666666667,
+    "cv_accuracy_folds": [
+      0.5533333333333333,
+      0.535,
+      0.5,
+      0.55,
+      0.535
+    ],
+    "confusion_matrix": [
+      [
+        98,
+        109
+      ],
+      [
+        185,
+        208
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 0.3462897526501767,
+        "recall": 0.47342995169082125,
+        "f1-score": 0.4,
+        "support": 207.0
+      },
+      "1": {
+        "precision": 0.6561514195583596,
+        "recall": 0.5292620865139949,
+        "f1-score": 0.5859154929577465,
+        "support": 393.0
+      },
+      "accuracy": 0.51,
+      "macro avg": {
+        "precision": 0.5012205861042682,
+        "recall": 0.5013460191024081,
+        "f1-score": 0.49295774647887325,
+        "support": 600.0
+      },
+      "weighted avg": {
+        "precision": 0.5492491444750365,
+        "recall": 0.51,
+        "f1-score": 0.521774647887324,
+        "support": 600.0
+      }
+    }
+  },
+  "comparison_holdout_accuracy": {
+    "logistic_regression": 0.655,
+    "decision_tree": 0.5833333333333334,
+    "random_forest": 0.6433333333333333
+  },
+  "feature_importance_xgb": {
+    "Lighting Conditions": 0.13411679863929749,
+    "Road Condition": 0.13400913774967194,
+    "Number of Vehicles Involved": 0.1292375922203064,
+    "Day of Week": 0.12353840470314026,
+    "Traffic Control Presence": 0.11316010355949402,
+    "Weather Conditions": 0.10323436558246613,
+    "Time_Category": 0.09851254522800446,
+    "Speed Limit (km/h)": 0.09283609688282013,
+    "Road Type": 0.07135500758886337
+  }
+}

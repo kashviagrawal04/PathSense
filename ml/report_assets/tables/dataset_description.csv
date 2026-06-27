@@ -1,0 +1,7 @@
+Metric,Value
+Dataset Source,pathsense/dataset/pedestrian_accidents.csv
+Rows,3000
+Columns,11
+Categorical Features,7
+Numeric Features,2
+Target Variable,"High_Risk (Serious/Fatal = 1, Minor = 0)"

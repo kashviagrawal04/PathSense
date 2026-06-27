@@ -1,0 +1,114 @@
+{
+  "version": "2.0",
+  "trained_at": "2026-08-06T11:23:41.044575",
+  "target": "High_Risk (Serious or Fatal = 1)",
+  "n_samples": 2399,
+  "n_features": 28,
+  "features": [
+    "Day of Week",
+    "Weather Conditions",
+    "Lighting Conditions",
+    "Road Type",
+    "Road Condition",
+    "Traffic Control Presence",
+    "Speed Limit (km/h)",
+    "Number of Vehicles Involved",
+    "Time_Category",
+    "hour_of_day",
+    "hour_sin",
+    "hour_cos",
+    "day_num",
+    "is_weekend",
+    "is_rush_hour",
+    "lighting_risk_score",
+    "is_dark",
+    "weather_risk_score",
+    "is_bad_weather",
+    "road_risk_score",
+    "traffic_control_risk",
+    "dark_and_wet",
+    "night_highway",
+    "bad_weather_dark",
+    "rush_hour_highway",
+    "multi_vehicle_high_speed",
+    "speed_bin",
+    "composite_risk_index"
+  ],
+  "model": "LGBMClassifier + CalibratedClassifierCV (Platt)",
+  "optimal_threshold": 0.09308632359621134,
+  "metrics": {
+    "roc_auc": 0.6184,
+    "accuracy": 0.7135,
+    "f1_score": 0.6482,
+    "average_precision": 0.5422,
+    "cv_roc_auc_mean": 0.9858433688603148,
+    "cv_roc_auc_std": 0.004906905627562391
+  },
+  "confusion_matrix": [
+    [
+      386,
+      30
+    ],
+    [
+      0,
+      64
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 1.0,
+      "recall": 0.9278846153846154,
+      "f1-score": 0.9625935162094763,
+      "support": 416.0
+    },
+    "1": {
+      "precision": 0.6808510638297872,
+      "recall": 1.0,
+      "f1-score": 0.810126582278481,
+      "support": 64.0
+    },
+    "accuracy": 0.9375,
+    "macro avg": {
+      "precision": 0.8404255319148937,
+      "recall": 0.9639423076923077,
+      "f1-score": 0.8863600492439787,
+      "support": 480.0
+    },
+    "weighted avg": {
+      "precision": 0.9574468085106383,
+      "recall": 0.9375,
+      "f1-score": 0.9422645916853436,
+      "support": 480.0
+    }
+  },
+  "feature_importance_top20": {
+    "Speed Limit (km/h)": 325,
+    "hour_sin": 267,
+    "hour_cos": 222,
+    "hour_of_day": 187,
+    "composite_risk_index": 170,
+    "Road Condition": 164,
+    "Lighting Conditions": 126,
+    "Day of Week": 105,
+    "speed_bin": 58,
+    "dark_and_wet": 50,
+    "Weather Conditions": 39,
+    "Traffic Control Presence": 39,
+    "Number of Vehicles Involved": 35,
+    "lighting_risk_score": 32,
+    "day_num": 31,
+    "road_risk_score": 26,
+    "Road Type": 25,
+    "rush_hour_highway": 21,
+    "weather_risk_score": 11,
+    "is_dark": 7
+  },
+  "v1_comparison": {
+    "v1_roc_auc": 0.5303,
+    "v1_accuracy": 0.51,
+    "v2_roc_auc": 0.6184,
+    "v2_accuracy": 0.7135,
+    "improvement_roc_auc": 0.0881,
+    "improvement_accuracy": 0.2035
+  }
+}

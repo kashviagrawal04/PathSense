@@ -1,0 +1,19 @@
+# PathSense v2 — Alert Service (Kafka consumer, SMS dispatch)
+FROM python:3.11-slim
+
+RUN groupadd -r pathsense && useradd -r -g pathsense pathsense
+
+WORKDIR /app
+
+COPY requirements-services.txt .
+RUN pip install --no-cache-dir -r requirements-services.txt
+
+COPY services/alert_service/ ./services/alert_service/
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+USER pathsense
+
+# No web server — this is a pure Kafka consumer worker
+CMD ["python", "-u", "services/alert_service/main.py"]

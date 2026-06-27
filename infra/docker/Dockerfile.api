@@ -1,0 +1,53 @@
+# PathSense v2 — Main API
+# Multi-stage build: keeps final image lean (~300MB vs ~1.2GB naive)
+
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+COPY requirements.txt requirements-services.txt ./
+
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir --target=/build/deps -r requirements.txt -r requirements-services.txt
+
+# ── Final stage ────────────────────────────────────────────────────────────────
+FROM python:3.11-slim
+
+LABEL maintainer="PathSense Team" \
+      version="2.0" \
+      description="PathSense pedestrian risk prediction API"
+
+# Non-root user for security
+RUN apt-get update && apt-get install -y libgomp1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -r pathsense && useradd -r -g pathsense pathsense
+
+WORKDIR /app
+
+# Copy deps from builder
+COPY --from=builder /build/deps /usr/local/lib/python3.11/site-packages/
+
+# Copy application code
+COPY api/ ./api/
+COPY ml/ ./ml/
+
+# ML artifacts are mounted at runtime (not baked into image)
+# docker run -v ./ml/artifacts:/app/ml/artifacts:ro ...
+
+ENV PYTHONPATH=/app/ml:/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PORT=8000
+
+EXPOSE 8000
+
+USER pathsense
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
+
+CMD ["python", "-m", "uvicorn", "api.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--workers", "2", \
+     "--loop", "uvloop", \
+     "--access-log"]

@@ -1,0 +1,24 @@
+{
+  "feature_columns": [
+    "Day of Week",
+    "Weather Conditions",
+    "Lighting Conditions",
+    "Road Type",
+    "Road Condition",
+    "Traffic Control Presence",
+    "Speed Limit (km/h)",
+    "Number of Vehicles Involved",
+    "Time_Category"
+  ],
+  "categorical_columns": [
+    "Day of Week",
+    "Weather Conditions",
+    "Lighting Conditions",
+    "Road Type",
+    "Road Condition",
+    "Traffic Control Presence",
+    "Time_Category"
+  ],
+  "primary_model_file": "random_forest.pkl",
+  "_primary_model_note": "Changed from xgboost_risk.pkl — model_report.json shows random_forest.pkl at 64.3% holdout accuracy vs xgboost's 51% (near chance level) on the same holdout set. No retraining needed, random_forest.pkl was already trained and saved."
+}
