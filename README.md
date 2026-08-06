@@ -1,10 +1,10 @@
-﻿# PathSense
+# PathSense 🚦
 
 **PathSense** is an advanced AI-powered pipeline and microservices architecture designed to predict high-risk pedestrian accidents and issue real-time alerts. It integrates machine learning, computer vision, and real-time sensor ingestion to create a comprehensive safety net for smart cities and autonomous systems.
 
 ---
 
-## Key Features
+## 🚀 Key Features
 
 * **Realistic ML Pipeline**: Features a machine learning pipeline (v2 & v3) using LightGBM. It utilizes Platt Scaling (`CalibratedClassifierCV`) to output true probability scores, achieving realistic **~71% accuracy** and **0.62 ROC-AUC** on real-world datasets with highly engineered features.
 * **Microservices Architecture**: Built with modern, asynchronous FastAPI microservices:
@@ -12,35 +12,35 @@
   * `vision`: Processes camera feeds and visual hazard detection.
   * `alert_service`: Manages PostgreSQL database logging and Twilio SMS/email notifications.
 * **Production-Grade Security**: 
-  * ≡ƒöÆ **Authentication**: Secured via `X-API-Key` headers across all microservices.
-  * ≡ƒ¢í∩╕Å **CORS**: Strict `ALLOWED_ORIGINS` configuration preventing unauthorized frontend access.
-  * ≡ƒöæ **Secrets Management**: Fail-fast startup validation for database URLs and Twilio credentials.
+  * 🔒 **Authentication**: Secured via `X-API-Key` headers across all microservices.
+  * 🛡️ **CORS**: Strict `ALLOWED_ORIGINS` configuration preventing unauthorized frontend access.
+  * 🔑 **Secrets Management**: Fail-fast startup validation for database URLs and Twilio credentials.
 * **CI/CD Integration**: Automated GitHub Actions workflows that run `pytest` and validate model accuracy on every push.
 * **Interactive Frontend**: A beautiful web dashboard equipped with Leaflet maps to visualize sensor data, track camera feeds, and display real-time alert notifications.
 
-## Project Structure
+## 📂 Project Structure
 
 ```text
 PathSense/
-Γö£ΓöÇΓöÇ .github/workflows/    # CI/CD pipelines
-Γö£ΓöÇΓöÇ api/                  # API Gateway / Routing
-Γö£ΓöÇΓöÇ dataset/              # Real-world training data (e.g. pedestrian_accidents.csv)
-Γö£ΓöÇΓöÇ frontend/             # Dashboard UI (HTML, CSS, Leaflet JS)
-Γö£ΓöÇΓöÇ infra/                # Infrastructure & Docker (postgres-init.sql, etc.)
-Γö£ΓöÇΓöÇ ml/                   # Machine Learning Models
-Γöé   Γö£ΓöÇΓöÇ artifacts/        # Serialized models, encoders, and metrics reports
-Γöé   Γö£ΓöÇΓöÇ train_v2.py       # Advanced v2 pipeline (LightGBM on real data)
-Γöé   Γö£ΓöÇΓöÇ train_v3.py       # Unified schema v3 pipeline (Simulation / Dynamic)
-Γöé   ΓööΓöÇΓöÇ predictor_v2.py   # Dynamic model loader & inference engine
-Γö£ΓöÇΓöÇ monitoring/           # Grafana dashboards & Prometheus configs
-Γö£ΓöÇΓöÇ services/             # FastAPI Microservices
-Γöé   Γö£ΓöÇΓöÇ alert_service/
-Γöé   Γö£ΓöÇΓöÇ sensor_ingest/
-Γöé   ΓööΓöÇΓöÇ vision/
-ΓööΓöÇΓöÇ docker-compose.yml    # Local multi-container orchestration
+├── .github/workflows/    # CI/CD pipelines
+├── api/                  # API Gateway / Routing
+├── dataset/              # Real-world training data (e.g. pedestrian_accidents.csv)
+├── frontend/             # Dashboard UI (HTML, CSS, Leaflet JS)
+├── infra/                # Infrastructure & Docker (postgres-init.sql, etc.)
+├── ml/                   # Machine Learning Models
+│   ├── artifacts/        # Serialized models, encoders, and metrics reports
+│   ├── train_v2.py       # Advanced v2 pipeline (LightGBM on real data)
+│   ├── train_v3.py       # Unified schema v3 pipeline (Simulation / Dynamic)
+│   └── predictor_v2.py   # Dynamic model loader & inference engine
+├── monitoring/           # Grafana dashboards & Prometheus configs
+├── services/             # FastAPI Microservices
+│   ├── alert_service/
+│   ├── sensor_ingest/
+│   └── vision/
+└── docker-compose.yml    # Local multi-container orchestration
 ```
 
-## ≡ƒ¢á∩╕Å Setup & Installation
+## 🛠️ Setup & Installation
 
 ### Prerequisites
 * Python 3.9+
@@ -92,7 +92,7 @@ uvicorn services.vision.main:app --port 8002 --reload
 uvicorn services.alert_service.main:app --port 8003 --reload
 ```
 
-## ≡ƒôê Model Performance
+## 📈 Model Performance
 The current production model (`lgbm_v2_calibrated.pkl`) has been fine-tuned for high recall on severe accidents:
 - **Accuracy**: ~71%
 - **ROC-AUC**: ~0.62
