@@ -173,6 +173,8 @@ jobs:
           helm upgrade --install pathsense ./infra/k8s/helm/pathsense \
             --namespace pathsense \
             --create-namespace \
+            --set global.image.registry=${{ env.REGISTRY }}/${{ github.repository_owner }} \
+            --set sensorIngest.image.name=pathsense-sensor \
             --set global.image.tag=${{ github.sha }} \
             --set secrets.openweathermapApiKey="dummy" \
             --set secrets.twilioAccountSid="dummy" \
