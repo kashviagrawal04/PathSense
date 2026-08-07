@@ -23,6 +23,18 @@ spec:
           env:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: {{ .Values.kafka.bootstrapServers | quote }}
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pathsense-secrets
+                  key: openweathermap-api-key
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 ---
 apiVersion: v1
 kind: Service

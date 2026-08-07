@@ -174,25 +174,38 @@ jobs:
             --namespace pathsense \
             --create-namespace \
             --set global.image.registry=${{ env.REGISTRY }}/${{ github.repository_owner }} \
-            --set sensorIngest.image.name=pathsense-sensor \
             --set global.image.tag=${{ github.sha }} \
+            --set global.image.pullPolicy=Never \
+            --set sensorIngest.image.name=pathsense-sensor \
             --set secrets.openweathermapApiKey="dummy" \
             --set secrets.twilioAccountSid="dummy" \
             --set secrets.twilioAuthToken="dummy" \
             --set secrets.twilioFromNumber="dummy" \
             --set mlArtifacts.enabled=false \
-            --set mlArtifacts.accessMode=ReadWriteOnce \
             --set api.autoscaling.enabled=false \
             --set sensorIngest.autoscaling.enabled=false \
             --set api.replicaCount=1 \
             --set sensorIngest.replicaCount=1 \
             --set predictionConsumer.replicaCount=1 \
             --set alertService.replicaCount=1 \
-            --set api.resources.requests.cpu=50m,api.resources.requests.memory=128Mi \
-            --set sensorIngest.resources.requests.cpu=50m,sensorIngest.resources.requests.memory=128Mi \
-            --set predictionConsumer.resources.requests.cpu=50m,predictionConsumer.resources.requests.memory=128Mi \
+            --set api.resources.requests.cpu=50m \
+            --set api.resources.requests.memory=64Mi \
+            --set api.resources.limits.cpu=200m \
+            --set api.resources.limits.memory=256Mi \
+            --set sensorIngest.resources.requests.cpu=50m \
+            --set sensorIngest.resources.requests.memory=64Mi \
+            --set sensorIngest.resources.limits.cpu=200m \
+            --set sensorIngest.resources.limits.memory=256Mi \
+            --set predictionConsumer.resources.requests.cpu=50m \
+            --set predictionConsumer.resources.requests.memory=64Mi \
+            --set predictionConsumer.resources.limits.cpu=200m \
+            --set predictionConsumer.resources.limits.memory=256Mi \
+            --set alertService.resources.requests.cpu=50m \
+            --set alertService.resources.requests.memory=64Mi \
+            --set alertService.resources.limits.cpu=200m \
+            --set alertService.resources.limits.memory=256Mi \
             --wait \
-            --timeout 5m
+            --timeout 8m
 
       - name: Debug cluster on failure
         if: failure()

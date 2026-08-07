@@ -30,6 +30,11 @@ spec:
               value: {{ .Values.redis.url | quote }}
             - name: DATABASE_URL
               value: "postgresql://{{ .Values.postgres.username }}:{{ .Values.secrets.postgresPassword }}@{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pathsense-secrets
+                  key: openweathermap-api-key
           resources:
             requests:
               cpu: {{ .Values.sensorIngest.resources.requests.cpu | quote }}
