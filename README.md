@@ -4,9 +4,7 @@
 
 ---
 
-
-https://github.com/user-attachments/assets/7466b10c-f140-44c4-82d3-5a013969735a
-
+https://github.com/user-attachments/assets/0d1ced27-b342-4ca6-b046-178bb9e054f2
 
 ## 🚀 Key Features
 
