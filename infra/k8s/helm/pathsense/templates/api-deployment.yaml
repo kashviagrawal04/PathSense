@@ -26,9 +26,6 @@ spec:
         prometheus.io/port: "8000"
         prometheus.io/path: "/metrics"
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
       containers:
         - name: api
           image: "{{ .Values.global.image.registry }}/{{ .Values.api.image.name }}:{{ .Values.global.image.tag }}"
@@ -79,9 +76,9 @@ spec:
             httpGet:
               path: /
               port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 2
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
           {{- if .Values.mlArtifacts.enabled }}
           volumeMounts:
             - name: ml-artifacts
@@ -110,6 +107,7 @@ spec:
       name: http
   selector:
     app: pathsense-api
+{{- if .Values.api.autoscaling.enabled }}
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -135,3 +133,4 @@ spec:
         target:
           type: Utilization
           averageUtilization: {{ .Values.api.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}
