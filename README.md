@@ -4,6 +4,10 @@
 
 ---
 
+
+https://github.com/user-attachments/assets/7466b10c-f140-44c4-82d3-5a013969735a
+
+
 ## 🚀 Key Features
 
 * **Realistic ML Pipeline**: Features a machine learning pipeline (v2 & v3) using LightGBM. It utilizes Platt Scaling (`CalibratedClassifierCV`) to output true probability scores, achieving realistic **~71% accuracy** and **0.62 ROC-AUC** on real-world datasets with highly engineered features.
