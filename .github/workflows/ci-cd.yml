@@ -182,30 +182,32 @@ jobs:
             --set secrets.twilioAuthToken="dummy" \
             --set secrets.twilioFromNumber="dummy" \
             --set mlArtifacts.enabled=false \
+            --set ingress.enabled=false \
+            --set monitoring.serviceMonitor.enabled=false \
             --set api.autoscaling.enabled=false \
             --set sensorIngest.autoscaling.enabled=false \
             --set api.replicaCount=1 \
             --set sensorIngest.replicaCount=1 \
             --set predictionConsumer.replicaCount=1 \
             --set alertService.replicaCount=1 \
-            --set api.resources.requests.cpu=50m \
-            --set api.resources.requests.memory=64Mi \
-            --set api.resources.limits.cpu=200m \
-            --set api.resources.limits.memory=256Mi \
+            --set api.resources.requests.cpu=100m \
+            --set api.resources.requests.memory=256Mi \
+            --set api.resources.limits.cpu=500m \
+            --set api.resources.limits.memory=512Mi \
             --set sensorIngest.resources.requests.cpu=50m \
             --set sensorIngest.resources.requests.memory=64Mi \
             --set sensorIngest.resources.limits.cpu=200m \
-            --set sensorIngest.resources.limits.memory=256Mi \
+            --set sensorIngest.resources.limits.memory=384Mi \
             --set predictionConsumer.resources.requests.cpu=50m \
             --set predictionConsumer.resources.requests.memory=64Mi \
             --set predictionConsumer.resources.limits.cpu=200m \
-            --set predictionConsumer.resources.limits.memory=256Mi \
+            --set predictionConsumer.resources.limits.memory=384Mi \
             --set alertService.resources.requests.cpu=50m \
             --set alertService.resources.requests.memory=64Mi \
             --set alertService.resources.limits.cpu=200m \
-            --set alertService.resources.limits.memory=256Mi \
+            --set alertService.resources.limits.memory=384Mi \
             --wait \
-            --timeout 8m
+            --timeout 10m
 
       - name: Debug cluster on failure
         if: failure()
